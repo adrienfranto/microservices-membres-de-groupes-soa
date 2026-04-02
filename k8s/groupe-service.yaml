@@ -41,52 +41,16 @@ spec:
       labels:
         app: groupe-service
     spec:
-      topologySpreadConstraints:
-        - maxSkew: 1
-          topologyKey: kubernetes.io/hostname
-          whenUnsatisfiable: DoNotSchedule
-          labelSelector:
-            matchLabels:
-              app: groupe-service
-      affinity:
-        podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-            - weight: 100
-              podAffinityTerm:
-                labelSelector:
-                  matchLabels:
-                    app: groupe-service
-                topologyKey: kubernetes.io/hostname
-      containers:
-        - name: groupe-service
-          image: radrienfranto1/groupe-service:1.0
-          ports:
-            - containerPort: 8081
-          imagePullPolicy: IfNotPresent
           env:
             - name: JAVA_TOOL_OPTIONS
-              value: "-Xms128m -Xmx128m"
+              value: "-Xms256m -Xmx256m"
           resources:
             requests:
               cpu: "100m"
               memory: "128Mi"
             limits:
               cpu: "500m"
-              memory: "256Mi"
-          readinessProbe:
-            httpGet:
-              path: /actuator/health
-              port: 8082
-            initialDelaySeconds: 30
-            periodSeconds: 10
-            failureThreshold: 3
-          livenessProbe:
-            httpGet:
-              path: /actuator/health
-              port: 8082
-            initialDelaySeconds: 60
-            periodSeconds: 20
-            failureThreshold: 5
+              memory: "512Mi"
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler

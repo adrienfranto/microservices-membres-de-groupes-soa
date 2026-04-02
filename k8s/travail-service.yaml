@@ -41,52 +41,16 @@ spec:
       labels:
         app: travail-service
     spec:
-      topologySpreadConstraints:
-        - maxSkew: 1
-          topologyKey: kubernetes.io/hostname
-          whenUnsatisfiable: DoNotSchedule
-          labelSelector:
-            matchLabels:
-              app: travail-service
-      affinity:
-        podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-            - weight: 100
-              podAffinityTerm:
-                labelSelector:
-                  matchLabels:
-                    app: travail-service
-                topologyKey: kubernetes.io/hostname
-      containers:
-        - name: travail-service
-          image: radrienfranto1/travail-service:1.0
-          ports:
-            - containerPort: 8082
-          imagePullPolicy: IfNotPresent
           env:
             - name: JAVA_TOOL_OPTIONS
-              value: "-Xms128m -Xmx128m"
+              value: "-Xms256m -Xmx256m"
           resources:
             requests:
               cpu: "100m"
               memory: "128Mi"
             limits:
               cpu: "500m"
-              memory: "256Mi"
-          readinessProbe:
-            httpGet:
-              path: /actuator/health
-              port: 8081
-            initialDelaySeconds: 30
-            periodSeconds: 10
-            failureThreshold: 3
-          livenessProbe:
-            httpGet:
-              path: /actuator/health
-              port: 8081
-            initialDelaySeconds: 60
-            periodSeconds: 20
-            failureThreshold: 5
+              memory: "512Mi"
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler

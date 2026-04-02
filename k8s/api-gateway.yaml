@@ -42,49 +42,13 @@ spec:
       labels:
         app: api-gateway
     spec:
-      topologySpreadConstraints:
-        - maxSkew: 1
-          topologyKey: kubernetes.io/hostname
-          whenUnsatisfiable: DoNotSchedule
-          labelSelector:
-            matchLabels:
-              app: api-gateway
-      affinity:
-        podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-            - weight: 100
-              podAffinityTerm:
-                labelSelector:
-                  matchLabels:
-                    app: api-gateway
-                topologyKey: kubernetes.io/hostname
-      containers:
-        - name: api-gateway
-          image: radrienfranto1/api-gateway:1.0
-          ports:
-            - containerPort: 9000
-          imagePullPolicy: IfNotPresent
           resources:
             requests:
               cpu: "100m"
               memory: "128Mi"
             limits:
               cpu: "500m"
-              memory: "256Mi"
-          readinessProbe:
-            httpGet:
-              path: /actuator/health
-              port: 9000
-            initialDelaySeconds: 30
-            periodSeconds: 10
-            failureThreshold: 3
-          livenessProbe:
-            httpGet:
-              path: /actuator/health
-              port: 9000
-            initialDelaySeconds: 60
-            periodSeconds: 20
-            failureThreshold: 5
+              memory: "384Mi"
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler

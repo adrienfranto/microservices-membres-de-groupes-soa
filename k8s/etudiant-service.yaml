@@ -42,50 +42,13 @@ spec:
         app: etudiant-service
     spec:
       # ── Répartit les pods sur des nœuds différents (HA) ──
-      topologySpreadConstraints:
-        - maxSkew: 1
-          topologyKey: kubernetes.io/hostname
-          whenUnsatisfiable: DoNotSchedule
-          labelSelector:
-            matchLabels:
-              app: etudiant-service
-      # ── Anti-affinity douce : préfère des nœuds différents ──
-      affinity:
-        podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-            - weight: 100
-              podAffinityTerm:
-                labelSelector:
-                  matchLabels:
-                    app: etudiant-service
-                topologyKey: kubernetes.io/hostname
-      containers:
-        - name: etudiant-service
-          image: radrienfranto1/etudiant-service:1.0
-          ports:
-            - containerPort: 8080
-          imagePullPolicy: IfNotPresent
           resources:
             requests:
               cpu: "100m"
               memory: "128Mi"
             limits:
               cpu: "500m"
-              memory: "256Mi"
-          readinessProbe:
-            httpGet:
-              path: /actuator/health
-              port: 8080
-            initialDelaySeconds: 30
-            periodSeconds: 10
-            failureThreshold: 3
-          livenessProbe:
-            httpGet:
-              path: /actuator/health
-              port: 8080
-            initialDelaySeconds: 60
-            periodSeconds: 20
-            failureThreshold: 5
+              memory: "512Mi"
           volumeMounts:
             - name: etudiant-images
               mountPath: /app/uploads/images
