@@ -41,7 +41,6 @@ spec:
       labels:
         app: groupe-service
     spec:
-      priorityClassName: high-priority-services
       topologySpreadConstraints:
         - maxSkew: 1
           topologyKey: kubernetes.io/hostname

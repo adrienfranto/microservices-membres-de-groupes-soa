@@ -41,7 +41,6 @@ spec:
       labels:
         app: etudiant-service
     spec:
-      priorityClassName: high-priority-services
       # ── Répartit les pods sur des nœuds différents (HA) ──
       topologySpreadConstraints:
         - maxSkew: 1

@@ -42,7 +42,6 @@ spec:
       labels:
         app: api-gateway
     spec:
-      priorityClassName: high-priority-services
       topologySpreadConstraints:
         - maxSkew: 1
           topologyKey: kubernetes.io/hostname

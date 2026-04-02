@@ -1,5 +1,4 @@
-gcloud projects add-iam-policy-binding project-f3cc5de9-ac6f-4df9-88a \
-  --member="serviceAccount:782413989067@cloudbuild.gserviceaccount.com" \
-  --role="roles/container.developer"
+# Google Cloud / Kubernetes Deployment Notes
+# Role: roles/container.developer
 
-
+# TODO: Keep secrets out of this file!

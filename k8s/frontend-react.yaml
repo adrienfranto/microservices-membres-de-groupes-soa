@@ -42,7 +42,6 @@ spec:
       labels:
         app: frontend-react
     spec:
-      priorityClassName: normal-priority-frontend
       topologySpreadConstraints:
         - maxSkew: 1
           topologyKey: kubernetes.io/hostname
