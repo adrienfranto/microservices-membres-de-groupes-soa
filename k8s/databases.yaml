@@ -43,6 +43,27 @@ spec:
         app: mongodb
     spec:
       terminationGracePeriodSeconds: 30
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app: mongodb
+                topologyKey: "kubernetes.io/hostname"
+            - weight: 50
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app: postgres-groupe
+                topologyKey: "kubernetes.io/hostname"
+            - weight: 50
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app: postgres-travail
+                topologyKey: "kubernetes.io/hostname"
       containers:
         - name: mongodb
           image: mongo:6.0
@@ -58,10 +79,10 @@ spec:
           resources:
             requests:
               cpu: "100m"
-              memory: "512Mi"
+              memory: "256Mi"
             limits:
-              cpu: "1"
-              memory: "2Gi"
+              cpu: "500m"
+              memory: "1Gi"
           readinessProbe:
             exec:
               command:
@@ -74,8 +95,9 @@ spec:
                 - "admin"
                 - "--eval"
                 - "db.adminCommand('ping')"
-            initialDelaySeconds: 20
+            initialDelaySeconds: 40
             periodSeconds: 15
+            timeoutSeconds: 10
             failureThreshold: 3
           livenessProbe:
             exec:
@@ -89,8 +111,9 @@ spec:
                 - "admin"
                 - "--eval"
                 - "db.adminCommand('ping')"
-            initialDelaySeconds: 30
+            initialDelaySeconds: 60
             periodSeconds: 20
+            timeoutSeconds: 10
             failureThreshold: 5
           volumeMounts:
             - name: mongodb-data
@@ -140,6 +163,27 @@ spec:
         app: postgres-groupe
     spec:
       terminationGracePeriodSeconds: 30
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app: postgres-groupe
+                topologyKey: "kubernetes.io/hostname"
+            - weight: 50
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app: mongodb
+                topologyKey: "kubernetes.io/hostname"
+            - weight: 50
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app: postgres-travail
+                topologyKey: "kubernetes.io/hostname"
       containers:
         - name: postgres-groupe
           image: postgres:15
@@ -157,10 +201,10 @@ spec:
           resources:
             requests:
               cpu: "100m"
-              memory: "512Mi"
+              memory: "256Mi"
             limits:
-              cpu: "1"
-              memory: "2Gi"
+              cpu: "500m"
+              memory: "1Gi"
           readinessProbe:
             exec:
               command:
@@ -169,8 +213,9 @@ spec:
                 - "adrien"
                 - "-d"
                 - "groupe_service"
-            initialDelaySeconds: 15
+            initialDelaySeconds: 30
             periodSeconds: 10
+            timeoutSeconds: 5
             failureThreshold: 3
           livenessProbe:
             exec:
@@ -180,8 +225,9 @@ spec:
                 - "adrien"
                 - "-d"
                 - "groupe_service"
-            initialDelaySeconds: 25
+            initialDelaySeconds: 60
             periodSeconds: 20
+            timeoutSeconds: 5
             failureThreshold: 5
           volumeMounts:
             - name: postgres-groupe-data
@@ -231,6 +277,27 @@ spec:
         app: postgres-travail
     spec:
       terminationGracePeriodSeconds: 30
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app: postgres-travail
+                topologyKey: "kubernetes.io/hostname"
+            - weight: 50
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app: mongodb
+                topologyKey: "kubernetes.io/hostname"
+            - weight: 50
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app: postgres-groupe
+                topologyKey: "kubernetes.io/hostname"
       containers:
         - name: postgres-travail
           image: postgres:15
@@ -248,10 +315,10 @@ spec:
           resources:
             requests:
               cpu: "100m"
-              memory: "512Mi"
+              memory: "256Mi"
             limits:
-              cpu: "1"
-              memory: "2Gi"
+              cpu: "500m"
+              memory: "1Gi"
           readinessProbe:
             exec:
               command:
@@ -260,8 +327,9 @@ spec:
                 - "postgres"
                 - "-d"
                 - "travail_service"
-            initialDelaySeconds: 15
+            initialDelaySeconds: 30
             periodSeconds: 10
+            timeoutSeconds: 5
             failureThreshold: 3
           livenessProbe:
             exec:
@@ -271,8 +339,9 @@ spec:
                 - "postgres"
                 - "-d"
                 - "travail_service"
-            initialDelaySeconds: 25
+            initialDelaySeconds: 60
             periodSeconds: 20
+            timeoutSeconds: 5
             failureThreshold: 5
           volumeMounts:
             - name: postgres-travail-data
