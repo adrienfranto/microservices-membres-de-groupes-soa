@@ -1,5 +1,5 @@
 # =====================================================================
-# DATABASES – StatefulSets (Ultra-Light for Local Cluster)
+# DATABASES – StatefulSets (Hyper-Light for Local Cluster)
 # =====================================================================
 
 # ---------------------------------------------------------------
@@ -40,7 +40,7 @@ spec:
       labels:
         app: mongodb
     spec:
-      terminationGracePeriodSeconds: 30
+      terminationGracePeriodSeconds: 10
       containers:
         - name: mongodb
           image: mongo:6.0
@@ -55,8 +55,8 @@ spec:
               value: etudiants
           resources:
             requests:
-              cpu: "100m"
-              memory: "128Mi"
+              cpu: "50m"
+              memory: "64Mi"
             limits:
               cpu: "500m"
               memory: "512Mi"
@@ -107,7 +107,7 @@ spec:
       labels:
         app: postgres-groupe
     spec:
-      terminationGracePeriodSeconds: 30
+      terminationGracePeriodSeconds: 10
       containers:
         - name: postgres-groupe
           image: postgres:15
@@ -124,8 +124,8 @@ spec:
               value: /var/lib/postgresql/data/pgdata
           resources:
             requests:
-              cpu: "100m"
-              memory: "128Mi"
+              cpu: "50m"
+              memory: "64Mi"
             limits:
               cpu: "500m"
               memory: "512Mi"
@@ -176,7 +176,7 @@ spec:
       labels:
         app: postgres-travail
     spec:
-      terminationGracePeriodSeconds: 30
+      terminationGracePeriodSeconds: 10
       containers:
         - name: postgres-travail
           image: postgres:15
@@ -193,8 +193,8 @@ spec:
               value: /var/lib/postgresql/data/pgdata
           resources:
             requests:
-              cpu: "100m"
-              memory: "128Mi"
+              cpu: "50m"
+              memory: "64Mi"
             limits:
               cpu: "500m"
               memory: "512Mi"
