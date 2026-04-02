@@ -22,8 +22,7 @@ spec:
                 name: api-gateway
                 port:
                   number: 9000
-    - host: frontend.local
-      http:
+    - http:
         paths:
           - path: /
             pathType: Prefix
