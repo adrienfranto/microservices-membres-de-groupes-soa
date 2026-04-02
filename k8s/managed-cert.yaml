@@ -1,7 +1,0 @@
-apiVersion: networking.gke.io/v1
-kind: ManagedCertificate
-metadata:
-  name: members-groups-cert
-spec:
-  domains:
-    - 34.144.192.107.sslip.io

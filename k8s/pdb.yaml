@@ -11,8 +11,9 @@ apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: pdb-api-gateway
+  namespace: microservices
 spec:
-  minAvailable: 2
+  minAvailable: 1
   selector:
     matchLabels:
       app: api-gateway
@@ -22,8 +23,9 @@ apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: pdb-etudiant-service
+  namespace: microservices
 spec:
-  minAvailable: 2
+  minAvailable: 1
   selector:
     matchLabels:
       app: etudiant-service
@@ -33,8 +35,9 @@ apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: pdb-groupe-service
+  namespace: microservices
 spec:
-  minAvailable: 2
+  minAvailable: 1
   selector:
     matchLabels:
       app: groupe-service
@@ -44,8 +47,9 @@ apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: pdb-travail-service
+  namespace: microservices
 spec:
-  minAvailable: 2
+  minAvailable: 1
   selector:
     matchLabels:
       app: travail-service
@@ -55,8 +59,9 @@ apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: pdb-frontend-react
+  namespace: microservices
 spec:
-  minAvailable: 2
+  minAvailable: 1
   selector:
     matchLabels:
       app: frontend-react
@@ -66,8 +71,9 @@ apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: pdb-mongodb
+  namespace: microservices
 spec:
-  minAvailable: 2
+  minAvailable: 1
   selector:
     matchLabels:
       app: mongodb
@@ -77,8 +83,9 @@ apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: pdb-postgres-groupe
+  namespace: microservices
 spec:
-  minAvailable: 2
+  minAvailable: 1
   selector:
     matchLabels:
       app: postgres-groupe
@@ -88,8 +95,9 @@ apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: pdb-postgres-travail
+  namespace: microservices
 spec:
-  minAvailable: 2
+  minAvailable: 1
   selector:
     matchLabels:
       app: postgres-travail
