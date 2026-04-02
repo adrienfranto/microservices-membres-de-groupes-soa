@@ -62,7 +62,7 @@ spec:
                 topologyKey: kubernetes.io/hostname
       containers:
         - name: etudiant-service
-          image: adrienfranto/etudiant-service:1.0
+          image: radrienfranto1/etudiant-service:1.0
           ports:
             - containerPort: 8080
           imagePullPolicy: IfNotPresent

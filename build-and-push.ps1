@@ -1,5 +1,5 @@
 # build-and-push.ps1
-$DOCKER_HUB_USER = "adrienfranto"
+$DOCKER_HUB_USER = "radrienfranto1"
 $SERVICES = @("api-gateway", "etudiant-service", "groupe-service", "travail-service", "frontend-react")
 
 Write-Host "🚀 Starting Production Build and Push..." -ForegroundColor Cyan

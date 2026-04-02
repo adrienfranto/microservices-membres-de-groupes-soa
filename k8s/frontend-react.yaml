@@ -61,7 +61,7 @@ spec:
                 topologyKey: kubernetes.io/hostname
       containers:
         - name: frontend-react
-          image: adrienfranto/frontend-react:1.0
+          image: radrienfranto1/frontend-react:1.0
           ports:
             - containerPort: 80
           imagePullPolicy: IfNotPresent

@@ -1,6 +1,6 @@
 #!/bin/bash
 # build-and-push.sh
-DOCKER_HUB_USER="adrienfranto"
+DOCKER_HUB_USER="radrienfranto1"
 SERVICES=("api-gateway" "etudiant-service" "groupe-service" "travail-service" "frontend-react")
 
 echo "🚀 Starting Production Build and Push (Linux)..."

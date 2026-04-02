@@ -60,7 +60,7 @@ spec:
                 topologyKey: kubernetes.io/hostname
       containers:
         - name: travail-service
-          image: adrienfranto/travail-service:1.0
+          image: radrienfranto1/travail-service:1.0
           ports:
             - containerPort: 8082
           imagePullPolicy: IfNotPresent

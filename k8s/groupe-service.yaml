@@ -60,7 +60,7 @@ spec:
                 topologyKey: kubernetes.io/hostname
       containers:
         - name: groupe-service
-          image: adrienfranto/groupe-service:1.0
+          image: radrienfranto1/groupe-service:1.0
           ports:
             - containerPort: 8081
           imagePullPolicy: IfNotPresent

@@ -61,7 +61,7 @@ spec:
                 topologyKey: kubernetes.io/hostname
       containers:
         - name: api-gateway
-          image: adrienfranto/api-gateway:1.0
+          image: radrienfranto1/api-gateway:1.0
           ports:
             - containerPort: 9000
           imagePullPolicy: IfNotPresent
