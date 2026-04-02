@@ -327,22 +327,10 @@ spec:
                 - "postgres"
                 - "-d"
                 - "travail_service"
-            initialDelaySeconds: 30
-            periodSeconds: 10
-            timeoutSeconds: 10
-            failureThreshold: 3
-          livenessProbe:
-            exec:
-              command:
-                - pg_isready
-                - "-U"
-                - "postgres"
-                - "-d"
-                - "travail_service"
             initialDelaySeconds: 60
-            periodSeconds: 20
+            periodSeconds: 15
             timeoutSeconds: 10
-            failureThreshold: 5
+            failureThreshold: 6
           volumeMounts:
             - name: postgres-travail-data
               mountPath: /var/lib/postgresql/data
