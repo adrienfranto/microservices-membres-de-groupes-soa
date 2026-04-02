@@ -82,24 +82,8 @@ spec:
               memory: "256Mi"
             limits:
               cpu: "500m"
-              memory: "1Gi"
+              memory: "512Mi"
           readinessProbe:
-            exec:
-              command:
-                - mongosh
-                - "-u"
-                - "adrien"
-                - "-p"
-                - "franto"
-                - "--authenticationDatabase"
-                - "admin"
-                - "--eval"
-                - "db.adminCommand('ping')"
-            initialDelaySeconds: 40
-            periodSeconds: 15
-            timeoutSeconds: 10
-            failureThreshold: 3
-          livenessProbe:
             exec:
               command:
                 - mongosh
@@ -113,7 +97,7 @@ spec:
                 - "db.adminCommand('ping')"
             initialDelaySeconds: 60
             periodSeconds: 20
-            timeoutSeconds: 10
+            timeoutSeconds: 15
             failureThreshold: 5
           volumeMounts:
             - name: mongodb-data
