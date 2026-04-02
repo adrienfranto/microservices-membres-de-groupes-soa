@@ -1,7 +1,5 @@
 # =====================================================================
-# API-GATEWAY – Production HA + Load Balancing + Haute Performance
-# replicas: 2 | ClusterIP | probes | resources | topologySpread | priority
-# BackendConfig : session affinity CLIENT_IP + timeout 60s
+# API-GATEWAY – Stable Local Configuration
 # =====================================================================
 apiVersion: v1
 kind: Service
@@ -42,6 +40,12 @@ spec:
       labels:
         app: api-gateway
     spec:
+      containers:
+        - name: api-gateway
+          image: radrienfranto1/api-gateway:1.0
+          ports:
+            - containerPort: 9000
+          imagePullPolicy: IfNotPresent
           resources:
             requests:
               cpu: "100m"

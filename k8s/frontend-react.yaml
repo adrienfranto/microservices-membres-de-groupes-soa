@@ -1,7 +1,5 @@
 # =====================================================================
-# FRONTEND-REACT – Production HA + Load Balancing + Haute Performance
-# replicas: 2 | ClusterIP | probes | resources | topologySpread | priority
-# BackendConfig : timeout 30s + health check /
+# FRONTEND-REACT – Stable Local Configuration
 # =====================================================================
 apiVersion: v1
 kind: Service
@@ -42,6 +40,12 @@ spec:
       labels:
         app: frontend-react
     spec:
+      containers:
+        - name: frontend-react
+          image: radrienfranto1/frontend-react:1.0
+          ports:
+            - containerPort: 80
+          imagePullPolicy: IfNotPresent
           resources:
             requests:
               cpu: "100m"

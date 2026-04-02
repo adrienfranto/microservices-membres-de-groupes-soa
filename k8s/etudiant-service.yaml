@@ -1,6 +1,5 @@
 # =====================================================================
-# ETUDIANT-SERVICE – Production HA + Load Balancing + Haute Performance
-# replicas: 2 | ClusterIP | probes | resources | topologySpread | priority
+# ETUDIANT-SERVICE – Stable Local Configuration
 # =====================================================================
 apiVersion: v1
 kind: Service
@@ -41,7 +40,12 @@ spec:
       labels:
         app: etudiant-service
     spec:
-      # ── Répartit les pods sur des nœuds différents (HA) ──
+      containers:
+        - name: etudiant-service
+          image: radrienfranto1/etudiant-service:1.0
+          ports:
+            - containerPort: 8080
+          imagePullPolicy: IfNotPresent
           resources:
             requests:
               cpu: "100m"

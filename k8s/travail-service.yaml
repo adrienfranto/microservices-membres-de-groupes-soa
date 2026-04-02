@@ -1,6 +1,5 @@
 # =====================================================================
-# TRAVAIL-SERVICE – Production HA + Load Balancing + Haute Performance
-# replicas: 2 | ClusterIP | probes | resources | topologySpread | priority
+# TRAVAIL-SERVICE – Stable Local Configuration
 # =====================================================================
 apiVersion: v1
 kind: Service
@@ -41,6 +40,12 @@ spec:
       labels:
         app: travail-service
     spec:
+      containers:
+        - name: travail-service
+          image: radrienfranto1/travail-service:1.0
+          ports:
+            - containerPort: 8082
+          imagePullPolicy: IfNotPresent
           env:
             - name: JAVA_TOOL_OPTIONS
               value: "-Xms256m -Xmx256m"
