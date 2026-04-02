@@ -1,0 +1,165 @@
+steps:
+  # ──────────────────────────────────────────────
+  # BUILD & PUSH des images Docker (tag: latest)
+  # ──────────────────────────────────────────────
+
+  # 1. etudiant-service
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'us-central1-docker.pkg.dev/$PROJECT_ID/microservices-repo/etudiant-service:v1', './etudiant-service']
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'us-central1-docker.pkg.dev/$PROJECT_ID/microservices-repo/etudiant-service:v1']
+
+  # 2. groupe-service
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'us-central1-docker.pkg.dev/$PROJECT_ID/microservices-repo/groupe-service:v1', './groupe-service']
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'us-central1-docker.pkg.dev/$PROJECT_ID/microservices-repo/groupe-service:v1']
+
+  # 3. travail-service
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'us-central1-docker.pkg.dev/$PROJECT_ID/microservices-repo/travail-service:v1', './travail-service']
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'us-central1-docker.pkg.dev/$PROJECT_ID/microservices-repo/travail-service:v1']
+
+  # 4. api-gateway
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'us-central1-docker.pkg.dev/$PROJECT_ID/microservices-repo/api-gateway:v1', './api-gateway']
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'us-central1-docker.pkg.dev/$PROJECT_ID/microservices-repo/api-gateway:v1']
+
+  # 5. frontend-react
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'us-central1-docker.pkg.dev/$PROJECT_ID/microservices-repo/frontend-react:v1', './frontend_react']
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'us-central1-docker.pkg.dev/$PROJECT_ID/microservices-repo/frontend-react:v1']
+
+  # ──────────────────────────────────────────────
+  # CONNEXION AU CLUSTER GKE
+  # ──────────────────────────────────────────────
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        apt-get install -y google-cloud-sdk-gke-gcloud-auth-plugin
+        gcloud container clusters get-credentials cluster-ha-mini --region=us-central1
+    env:
+      - 'USE_GKE_GCLOUD_AUTH_PLUGIN=True'
+
+  # ──────────────────────────────────────────────
+  # DEPLOY – Ordre important pour les dépendances
+  # ──────────────────────────────────────────────
+
+  # 6. PriorityClasses (doit exister avant les pods)
+  - name: 'gcr.io/cloud-builders/kubectl'
+    args: ['apply', '-f', 'k8s/priority-class.yaml']
+    env:
+      - 'CLOUDSDK_COMPUTE_REGION=us-central1'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=cluster-ha-mini'
+
+  # 7. PVC (volumes pour les bases de données)
+  - name: 'gcr.io/cloud-builders/kubectl'
+    args: ['apply', '-f', 'k8s/pvc.yaml']
+    env:
+      - 'CLOUDSDK_COMPUTE_REGION=us-central1'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=cluster-ha-mini'
+
+  # 8. BackendConfig GKE (load balancing avancé)
+  - name: 'gcr.io/cloud-builders/kubectl'
+    args: ['apply', '-f', 'k8s/backend-config.yaml']
+    env:
+      - 'CLOUDSDK_COMPUTE_REGION=us-central1'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=cluster-ha-mini'
+
+  # 9. NFS Server (requis par etudiant-service pour le volume images)
+  - name: 'gcr.io/cloud-builders/kubectl'
+    args: ['apply', '-f', 'k8s/nfs-server.yaml']
+    env:
+      - 'CLOUDSDK_COMPUTE_REGION=us-central1'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=cluster-ha-mini'
+
+  # 9. Bases de données (StatefulSets MongoDB + PostgreSQL)
+  - name: 'gcr.io/cloud-builders/kubectl'
+    args: ['apply', '-f', 'k8s/databases.yaml']
+    env:
+      - 'CLOUDSDK_COMPUTE_REGION=us-central1'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=cluster-ha-mini'
+
+  # 10. Microservices
+  - name: 'gcr.io/cloud-builders/kubectl'
+    args: ['apply', '-f', 'k8s/etudiant-service.yaml']
+    env:
+      - 'CLOUDSDK_COMPUTE_REGION=us-central1'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=cluster-ha-mini'
+
+  - name: 'gcr.io/cloud-builders/kubectl'
+    args: ['apply', '-f', 'k8s/groupe-service.yaml']
+    env:
+      - 'CLOUDSDK_COMPUTE_REGION=us-central1'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=cluster-ha-mini'
+
+  - name: 'gcr.io/cloud-builders/kubectl'
+    args: ['apply', '-f', 'k8s/travail-service.yaml']
+    env:
+      - 'CLOUDSDK_COMPUTE_REGION=us-central1'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=cluster-ha-mini'
+
+  - name: 'gcr.io/cloud-builders/kubectl'
+    args: ['apply', '-f', 'k8s/api-gateway.yaml']
+    env:
+      - 'CLOUDSDK_COMPUTE_REGION=us-central1'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=cluster-ha-mini'
+
+  - name: 'gcr.io/cloud-builders/kubectl'
+    args: ['apply', '-f', 'k8s/frontend-react.yaml']
+    env:
+      - 'CLOUDSDK_COMPUTE_REGION=us-central1'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=cluster-ha-mini'
+
+  # 11. PDB (dépend des deployments)
+
+  - name: 'gcr.io/cloud-builders/kubectl'
+    args: ['apply', '-f', 'k8s/pdb.yaml']
+    env:
+      - 'CLOUDSDK_COMPUTE_REGION=us-central1'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=cluster-ha-mini'
+
+  # 12. Ingress + Certificat SSL
+  - name: 'gcr.io/cloud-builders/kubectl'
+    args: ['apply', '-f', 'k8s/ingress.yaml']
+    env:
+      - 'CLOUDSDK_COMPUTE_REGION=us-central1'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=cluster-ha-mini'
+
+  - name: 'gcr.io/cloud-builders/kubectl'
+    args: ['apply', '-f', 'k8s/managed-cert.yaml']
+    env:
+      - 'CLOUDSDK_COMPUTE_REGION=us-central1'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=cluster-ha-mini'
+
+  # ──────────────────────────────────────────────
+  # ROLLOUT RESTART – force le rechargement des images
+  # ──────────────────────────────────────────────
+  - name: 'gcr.io/cloud-builders/kubectl'
+    args:
+      - 'rollout'
+      - 'restart'
+      - 'deployment'
+      - 'etudiant-service'
+      - 'groupe-service'
+      - 'travail-service'
+      - 'api-gateway'
+      - 'frontend-react'
+    env:
+      - 'CLOUDSDK_COMPUTE_REGION=us-central1'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=cluster-ha-mini'
+
+images:
+  - 'us-central1-docker.pkg.dev/$PROJECT_ID/microservices-repo/etudiant-service:v1'
+  - 'us-central1-docker.pkg.dev/$PROJECT_ID/microservices-repo/groupe-service:v1'
+  - 'us-central1-docker.pkg.dev/$PROJECT_ID/microservices-repo/travail-service:v1'
+  - 'us-central1-docker.pkg.dev/$PROJECT_ID/microservices-repo/api-gateway:v1'
+  - 'us-central1-docker.pkg.dev/$PROJECT_ID/microservices-repo/frontend-react:v1'
+
+options:
+  logging: CLOUD_LOGGING_ONLY

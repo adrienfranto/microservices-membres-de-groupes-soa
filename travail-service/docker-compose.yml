@@ -1,0 +1,24 @@
+version: "3.8"
+services:
+  travail-service-postgres:
+    image: postgres:15
+    container_name: travail-service-postgres
+    environment:
+      POSTGRES_DB: travail_service
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: devsecops
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+      - ./docker/postgresql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: always
+
+  travail-service:
+    build: .
+    container_name: travail-service
+    ports:
+      - "8081:8081"
+    depends_on:
+      - travail-service-postgres
+    restart: always

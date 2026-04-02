@@ -1,0 +1,32 @@
+# =====================================================================
+# PRIORITY CLASSES – Haute Performance
+# Garantit que les services critiques sont schedulés en priorité
+# même en cas de pression mémoire sur le cluster
+# =====================================================================
+
+# Priorité critique – bases de données (jamais évictées)
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: high-priority-db
+value: 1000000
+globalDefault: false
+description: "Priorité haute pour les bases de données (MongoDB, PostgreSQL)"
+---
+# Priorité haute – microservices backend
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: high-priority-services
+value: 900000
+globalDefault: false
+description: "Priorité haute pour les microservices (api-gateway, etudiant, groupe, travail)"
+---
+# Priorité normale – frontend
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: normal-priority-frontend
+value: 800000
+globalDefault: false
+description: "Priorité normale pour le frontend React"

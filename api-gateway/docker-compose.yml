@@ -1,0 +1,7 @@
+services:
+  api-gateway:
+    build: .
+    container_name: api-gateway
+    ports:
+      - "9000:9000"
+    restart: always

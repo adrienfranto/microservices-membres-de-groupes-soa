@@ -1,0 +1,24 @@
+version: "3.8"
+services:
+  groupe-service-postgres:
+    image: postgres:15
+    container_name: groupe-service-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: groupe_service
+      POSTGRES_USER: adrien
+      POSTGRES_PASSWORD: franto
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+      - ./docker/postgresql/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  groupe-service:
+    build: .
+    container_name: groupe-service
+    ports:
+      - "8082:8082"
+    depends_on:
+      - groupe-service-postgres
+    restart: always

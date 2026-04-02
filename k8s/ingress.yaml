@@ -1,0 +1,34 @@
+# =====================================================================
+# INGRESS – GKE Global Load Balancer HTTPS
+# IP statique : members-groups-ip (34.144.192.107)
+# Certificat géré : members-groups-cert
+# HTTPS only – HTTP désactivé
+# =====================================================================
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: members-groups-ingress
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: "members-groups-ip"
+    networking.gke.io/managed-certificates: "members-groups-cert"
+    kubernetes.io/ingress.allow-http: "true"
+    kubernetes.io/ingress.class: "gce"
+spec:
+  rules:
+    - host: 34.144.192.107.sslip.io
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: api-gateway
+                port:
+                  number: 9000
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend-react
+                port:
+                  number: 80

@@ -1,0 +1,95 @@
+# =====================================================================
+# PodDisruptionBudget – Haute Disponibilité
+# Garantit qu'au moins 1 pod reste disponible pendant :
+#   - Nœud drainé (kubectl drain)
+#   - Mise à jour de nœud GKE
+#   - Maintenance du cluster
+# =====================================================================
+
+# API Gateway
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: pdb-api-gateway
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: api-gateway
+---
+# Etudiant Service
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: pdb-etudiant-service
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: etudiant-service
+---
+# Groupe Service
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: pdb-groupe-service
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: groupe-service
+---
+# Travail Service
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: pdb-travail-service
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: travail-service
+---
+# Frontend React
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: pdb-frontend-react
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: frontend-react
+---
+# MongoDB (StatefulSet)
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: pdb-mongodb
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: mongodb
+---
+# PostgreSQL Groupe (StatefulSet)
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: pdb-postgres-groupe
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: postgres-groupe
+---
+# PostgreSQL Travail (StatefulSet)
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: pdb-postgres-travail
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: postgres-travail

@@ -1,0 +1,277 @@
+# =====================================================================
+# DATABASES – StatefulSets production-ready
+# Credentials en clair (usage étudiant/dev)
+# MongoDB + PostgreSQL groupe + PostgreSQL travail
+# =====================================================================
+
+# ---------------------------------------------------------------
+# MongoDB – Headless Service + StatefulSet
+# ---------------------------------------------------------------
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb-service
+  labels:
+    app: mongodb
+spec:
+  clusterIP: None
+  selector:
+    app: mongodb
+  ports:
+    - name: mongo
+      protocol: TCP
+      port: 27017
+      targetPort: 27017
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongodb
+  labels:
+    app: mongodb
+spec:
+  serviceName: "mongodb-service"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb
+  template:
+    metadata:
+      labels:
+        app: mongodb
+    spec:
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: mongodb
+          image: mongo:6.0
+          ports:
+            - containerPort: 27017
+          env:
+            - name: MONGO_INITDB_ROOT_USERNAME
+              value: adrien
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              value: franto
+            - name: MONGO_INITDB_DATABASE
+              value: etudiants
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "512Mi"
+            limits:
+              cpu: "1"
+              memory: "2Gi"
+          readinessProbe:
+            exec:
+              command:
+                - mongosh
+                - "-u"
+                - "adrien"
+                - "-p"
+                - "franto"
+                - "--authenticationDatabase"
+                - "admin"
+                - "--eval"
+                - "db.adminCommand('ping')"
+            initialDelaySeconds: 20
+            periodSeconds: 15
+            failureThreshold: 3
+          livenessProbe:
+            exec:
+              command:
+                - mongosh
+                - "-u"
+                - "adrien"
+                - "-p"
+                - "franto"
+                - "--authenticationDatabase"
+                - "admin"
+                - "--eval"
+                - "db.adminCommand('ping')"
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            failureThreshold: 5
+          volumeMounts:
+            - name: mongodb-data
+              mountPath: /data/db
+      volumes:
+        - name: mongodb-data
+          persistentVolumeClaim:
+            claimName: mongodb-pvc
+
+# ---------------------------------------------------------------
+# PostgreSQL Groupe – Headless Service + StatefulSet
+# ---------------------------------------------------------------
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-groupe-service
+  labels:
+    app: postgres-groupe
+spec:
+  clusterIP: None
+  selector:
+    app: postgres-groupe
+  ports:
+    - name: postgres
+      protocol: TCP
+      port: 5432
+      targetPort: 5432
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres-groupe
+  labels:
+    app: postgres-groupe
+spec:
+  serviceName: "postgres-groupe-service"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres-groupe
+  template:
+    metadata:
+      labels:
+        app: postgres-groupe
+    spec:
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: postgres-groupe
+          image: postgres:15
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: groupe_service
+            - name: POSTGRES_USER
+              value: adrien
+            - name: POSTGRES_PASSWORD
+              value: franto
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "512Mi"
+            limits:
+              cpu: "1"
+              memory: "2Gi"
+          readinessProbe:
+            exec:
+              command:
+                - pg_isready
+                - "-U"
+                - "adrien"
+                - "-d"
+                - "groupe_service"
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            failureThreshold: 3
+          livenessProbe:
+            exec:
+              command:
+                - pg_isready
+                - "-U"
+                - "adrien"
+                - "-d"
+                - "groupe_service"
+            initialDelaySeconds: 25
+            periodSeconds: 20
+            failureThreshold: 5
+          volumeMounts:
+            - name: postgres-groupe-data
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: postgres-groupe-data
+          persistentVolumeClaim:
+            claimName: postgres-groupe-pvc
+
+# ---------------------------------------------------------------
+# PostgreSQL Travail – Headless Service + StatefulSet
+# ---------------------------------------------------------------
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-travail-service
+  labels:
+    app: postgres-travail
+spec:
+  clusterIP: None
+  selector:
+    app: postgres-travail
+  ports:
+    - name: postgres
+      protocol: TCP
+      port: 5432
+      targetPort: 5432
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres-travail
+  labels:
+    app: postgres-travail
+spec:
+  serviceName: "postgres-travail-service"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres-travail
+  template:
+    metadata:
+      labels:
+        app: postgres-travail
+    spec:
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: postgres-travail
+          image: postgres:15
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: travail_service
+            - name: POSTGRES_USER
+              value: postgres
+            - name: POSTGRES_PASSWORD
+              value: devsecops
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "512Mi"
+            limits:
+              cpu: "1"
+              memory: "2Gi"
+          readinessProbe:
+            exec:
+              command:
+                - pg_isready
+                - "-U"
+                - "postgres"
+                - "-d"
+                - "travail_service"
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            failureThreshold: 3
+          livenessProbe:
+            exec:
+              command:
+                - pg_isready
+                - "-U"
+                - "postgres"
+                - "-d"
+                - "travail_service"
+            initialDelaySeconds: 25
+            periodSeconds: 20
+            failureThreshold: 5
+          volumeMounts:
+            - name: postgres-travail-data
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: postgres-travail-data
+          persistentVolumeClaim:
+            claimName: postgres-travail-pvc

@@ -1,0 +1,79 @@
+# =====================================================================
+# PERSISTENT VOLUME CLAIMS
+# premium-rwo = SSD persistent disk sur GKE (ReadWriteOnce)
+# =====================================================================
+
+# MongoDB
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongodb-pvc
+  labels:
+    app: mongodb
+spec:
+  storageClassName: premium-rwo
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+# PostgreSQL Groupe
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-groupe-pvc
+  labels:
+    app: postgres-groupe
+spec:
+  storageClassName: premium-rwo
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+# PostgreSQL Travail
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-travail-pvc
+  labels:
+    app: postgres-travail
+spec:
+  storageClassName: premium-rwo
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+# Uploads images étudiants (via Internal NFS for RWX)
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: etudiant-images-pv
+spec:
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    server: nfs-server-service.default.svc.cluster.local
+    path: "/"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: etudiant-images-pvc
+  labels:
+    app: etudiant-service
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 2Gi
+  storageClassName: ""
+  volumeName: etudiant-images-pv

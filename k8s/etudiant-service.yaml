@@ -1,0 +1,128 @@
+# =====================================================================
+# ETUDIANT-SERVICE – Production HA + Load Balancing + Haute Performance
+# replicas: 2 | ClusterIP | probes | resources | topologySpread | priority
+# =====================================================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: etudiant-service
+  labels:
+    app: etudiant-service
+  annotations:
+    cloud.google.com/backend-config: '{"default": "backend-config-etudiant"}'
+spec:
+  type: ClusterIP
+  selector:
+    app: etudiant-service
+  ports:
+    - name: http
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: etudiant-service
+  labels:
+    app: etudiant-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: etudiant-service
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 33%
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: etudiant-service
+    spec:
+      priorityClassName: high-priority-services
+      # ── Répartit les pods sur des nœuds différents (HA) ──
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              app: etudiant-service
+      # ── Anti-affinity douce : préfère des nœuds différents ──
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app: etudiant-service
+                topologyKey: kubernetes.io/hostname
+      containers:
+        - name: etudiant-service
+          image: us-central1-docker.pkg.dev/project-f3cc5de9-ac6f-4df9-88a/microservices-repo/etudiant-service:v1
+          ports:
+            - containerPort: 8080
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 60
+            periodSeconds: 20
+            failureThreshold: 5
+          volumeMounts:
+            - name: etudiant-images
+              mountPath: /app/uploads/images
+      volumes:
+        - name: etudiant-images
+          persistentVolumeClaim:
+            claimName: etudiant-images-pvc
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: hpa-etudiant-service
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: etudiant-service
+  minReplicas: 1
+  maxReplicas: 3
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 30
+      policies:
+        - type: Pods
+          value: 2
+          periodSeconds: 60
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+        - type: Pods
+          value: 1
+          periodSeconds: 120
