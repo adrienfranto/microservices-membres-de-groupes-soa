@@ -33,7 +33,7 @@ spec:
     spec:
       containers:
         - name: nfs-server
-          image: itsthenetwork/nfs-server-alpine:latest
+          image: gcr.io/google_containers/nfs-server-amd64:v1.1
           ports:
             - name: nfs
               containerPort: 2049
@@ -43,12 +43,9 @@ spec:
               containerPort: 111
           securityContext:
             privileged: true
-          env:
-            - name: SHARED_DIRECTORY
-              value: "/nfsshare"
           volumeMounts:
             - name: nfs-data
-              mountPath: /nfsshare
+              mountPath: /exports
       volumes:
         - name: nfs-data
           persistentVolumeClaim:
