@@ -2,3 +2,5 @@
 # Role: roles/container.developer
 
 # TODO: Keep secrets out of this file!
+
+kubectl delete pods -n microservices --all
