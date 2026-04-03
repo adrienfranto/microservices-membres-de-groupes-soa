@@ -51,21 +51,7 @@ spec:
     requests:
       storage: 10Gi
 ---
-# Uploads images étudiants (via Internal NFS for RWX)
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: etudiant-images-pv
-spec:
-  capacity:
-    storage: 2Gi
-  accessModes:
-    - ReadWriteMany
-  persistentVolumeReclaimPolicy: Retain
-  nfs:
-    server: nfs-server-service.microservices.svc.cluster.local
-    path: "/"
----
+# Uploads images étudiants (Direct Local Path - Single Node Fix)
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -74,10 +60,9 @@ metadata:
   labels:
     app: etudiant-service
 spec:
+  storageClassName: local-path
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   resources:
     requests:
       storage: 2Gi
-  storageClassName: ""
-  volumeName: etudiant-images-pv
