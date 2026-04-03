@@ -11,6 +11,11 @@ metadata:
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   ingressClassName: nginx
+  tls:
+    - hosts:
+        - api.local
+        - 192.168.88.50
+      secretName: microservices-tls
   rules:
     - host: api.local
       http:
