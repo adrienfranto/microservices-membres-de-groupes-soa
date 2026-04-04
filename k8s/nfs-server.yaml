@@ -33,7 +33,10 @@ spec:
     spec:
       containers:
         - name: nfs-server
-          image: gcr.io/google_containers/nfs-server-amd64:v1.1
+          image: itsthenetwork/nfs-server-alpine:latest
+          env:
+            - name: SHARED_DIRECTORY
+              value: "/exports"
           ports:
             - name: nfs
               containerPort: 2049
