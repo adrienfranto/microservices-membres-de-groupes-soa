@@ -1,0 +1,26 @@
+# Delete the frozen cluster
+minikube delete
+
+# Start with exactly 2048MB for permanent stability
+minikube start --memory=2048mb
+
+
+
+# Enable metrics
+minikube addons enable metrics-server
+
+# Run the setup script (It will now install the 1-replica config)
+./k8s/install-infrastructure.sh
+
+
+
+# Re-create the secure secret
+kubectl create secret tls microservices-tls -n microservices --cert=tls.crt --key=tls.key
+
+# Apply the GitOps application for the final time
+kubectl apply -f k8s/argocd-app.yaml -n argocd
+
+
+# After 3 minutes, confirm everything is green and stable!
+kubectl get applications -n argocd
+kubectl get pods -n microservices
